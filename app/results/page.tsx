@@ -2,23 +2,26 @@
 
 import { pytania } from "../data/questions";
 import { useQuizStore } from "../stores/quizStore";
+import { useRouter } from "next/navigation";
 
 function Page() {
-  const computeScore = useQuizStore((s) => s.computeScore);
-  const total = computeScore(pytania);
-  const storedScore = useQuizStore((s) => s.score);
+  const lastScore = useQuizStore((s) => s.lastScore);
   const reset = useQuizStore((s) => s.reset);
+  const router = useRouter();
 
   return (
     <div>
       <p>
-        Twoj wynik: {total} / {pytania.length}
+        Twoj wynik: {lastScore} / {pytania.length}
       </p>
       <button
         onClick={() => {
-          reset();
+          reset(pytania.length);
+          router.push("/quiz");
         }}
-      ></button>
+      >
+        Zagraj ponownie
+      </button>
     </div>
   );
 }

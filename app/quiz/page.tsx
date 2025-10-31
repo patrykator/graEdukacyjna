@@ -1,28 +1,63 @@
 "use client";
 
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useQuizStore } from "../stores/quizStore";
 import { pytania } from "../data/questions";
 
 export default function Page() {
+  const router = useRouter();
   const currentQuestion = useQuizStore((s) => s.currentQuestion);
   const next = useQuizStore((s) => s.next);
   const prev = useQuizStore((s) => s.prev);
   const setAnswer = useQuizStore((s) => s.setAnswer);
-  const setCurrent = useQuizStore((s) => s.setCurrent);
-  const chosen = useQuizStore((s) => s.answers[currentQuestion]);
-  const score = useQuizStore((s) => s.score);
+  const finish = useQuizStore((s) => s.finish);
+  const shuffledOrder = useQuizStore((s) => s.shuffledOrder);
 
-  const current = pytania[currentQuestion];
+  const originalIndex =
+    shuffledOrder && shuffledOrder.length
+      ? shuffledOrder[currentQuestion - 1]
+      : currentQuestion;
+
+  const chosen = useQuizStore((s) => s.answers[originalIndex]);
+
+  const current = pytania[originalIndex - 1];
   const lastQuestion = pytania.length;
+  const isLast = currentQuestion === lastQuestion;
 
   function handleChoose(key: string) {
-    setAnswer(currentQuestion, key, pytania);
+    setAnswer(originalIndex, key, pytania);
   }
 
   return (
     <div className="flex items-center justify-center h-screen">
       <div>
+        <div className="mb-2">
+          <div
+            role="progressbar"
+            aria-valuemin={1}
+            aria-valuemax={pytania.length}
+            aria-valuenow={currentQuestion}
+            style={{
+              width: "400px",
+              height: "10px",
+              background: "#e5e7eb",
+              borderRadius: 4,
+              overflow: "hidden",
+            }}
+          >
+            <div
+              style={{
+                height: "100%",
+                background: "#3b82f6",
+                width: `${Math.round(
+                  (currentQuestion / pytania.length) * 100
+                )}%`,
+                transition: "width 200ms ease",
+              }}
+            />
+          </div>
+        </div>
+
         {current ? (
           <div className="mb-4 border-6   border-gray-800 rounded-lg p-4  w-[500px]">
             <h3 className="m-0">{current.question}</h3>
@@ -51,24 +86,25 @@ export default function Page() {
         )}
 
         <div className="mt-3">
-          <button onClick={() => prev()} disabled={currentQuestion === 0}>
-            {currentQuestion !== 0 ? "Poprzednie" : null}
+          <button onClick={() => prev()} disabled={currentQuestion === 1}>
+            {currentQuestion !== 1 ? "Poprzednie" : null}
           </button>
 
           <button
-            onClick={() => next(pytania.length - 1)}
-            disabled={currentQuestion >= pytania.length - 1}
+            onClick={() => {
+              if (isLast) {
+                finish(pytania);
+                router.push("/results");
+              } else next(pytania.length);
+            }}
+            disabled={currentQuestion > pytania.length}
             className="ml-2"
           >
-            {currentQuestion + 1 === lastQuestion ? (
-              <Link href="/results">Zakoncz</Link>
-            ) : (
-              "Nastepne"
-            )}
+            {isLast ? "Zakoncz" : "Nastepne"}
           </button>
 
           <span className="ml-3">
-            Pytanie {currentQuestion + 1} / {pytania.length}
+            Pytanie {currentQuestion} / {pytania.length}
           </span>
         </div>
       </div>
