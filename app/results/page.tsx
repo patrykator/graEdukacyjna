@@ -1,29 +1,17 @@
-"use client";
+import { auth } from "@/auth";
+import { redirect } from "next/navigation";
+import { getLeaderboard, getUserResult } from "../actions";
+import ResultsClient from "./results-client";
 
-import { pytania } from "../data/questions";
-import { useQuizStore } from "../stores/quizStore";
-import { useRouter } from "next/navigation";
+export default async function ResultsPage() {
+  const session = await auth();
 
-function Page() {
-  const lastScore = useQuizStore((s) => s.lastScore);
-  const reset = useQuizStore((s) => s.reset);
-  const router = useRouter();
+  if (!session) {
+    redirect("/");
+  }
 
-  return (
-    <div>
-      <p>
-        Twoj wynik: {lastScore} / {pytania.length}
-      </p>
-      <button
-        onClick={() => {
-          reset(pytania.length);
-          router.push("/quiz");
-        }}
-      >
-        Zagraj ponownie
-      </button>
-    </div>
-  );
+  const leaderboard = await getLeaderboard();
+  const userResult = await getUserResult();
+
+  return <ResultsClient leaderboard={leaderboard} userResult={userResult} />;
 }
-
-export default Page;
