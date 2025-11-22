@@ -38,7 +38,7 @@ export default function ResultsClient({
 
       if (userResult.quizOrder) {
         getQuestionsByIds(userResult.quizOrder).then((qs) => {
-          const validQs = qs.filter((q): q is Question => q !== null);
+          const validQs = qs.filter((q) => q !== null) as Question[];
           setReviewQuestions(validQs);
         });
       }

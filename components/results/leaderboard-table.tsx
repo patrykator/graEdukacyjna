@@ -1,4 +1,4 @@
-import { Trophy, RotateCw, AlertTriangle } from "lucide-react";
+import { RotateCw, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { LeaderboardUser } from "@/types";
@@ -30,9 +30,7 @@ export function LeaderboardTable({
             disabled={isPending}
             title="Odśwież ranking"
           >
-            <RotateCw
-              className={cn("h-5 w-5", isPending && "animate-spin")}
-            />
+            <RotateCw className={cn("h-5 w-5", isPending && "animate-spin")} />
             <span className="sr-only">Odśwież</span>
           </Button>
         </div>
@@ -85,4 +83,3 @@ export function LeaderboardTable({
     </div>
   );
 }
-

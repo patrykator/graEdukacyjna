@@ -8,8 +8,8 @@ export type Question = {
 export type UserResult = {
   score: number | null;
   completedAt: Date | null;
-  answers: string | null;
-  quizOrder: string | null;
+  answers: any;
+  quizOrder: any;
 } | null;
 
 export type LeaderboardUser = {

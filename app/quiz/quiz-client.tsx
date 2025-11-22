@@ -66,7 +66,7 @@ export default function QuizClient({
         if (!isCheating) {
           router.push("/results");
         }
-      } catch (e) {}
+      } catch {}
     },
     [finish, router]
   );
