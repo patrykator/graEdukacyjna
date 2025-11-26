@@ -68,20 +68,6 @@ export default async function Home({
                   umiejętności i dowiedzieć się czegoś nowego. Pamiętaj, że
                   możesz podejść tylko raz!
                 </p>
-                <div className="bg-destructive/10 border-l-4 border-destructive p-4 text-left rounded-r-md">
-                  <div className="flex items-center gap-2 mb-2 text-destructive font-bold">
-                    <AlertTriangle className="h-5 w-5" />
-                    UWAGA!
-                  </div>
-                  <p className="text-sm text-destructive/90">
-                    Opuszczenie obszaru quizu (np. przełączenie karty,
-                    zminimalizowanie okna) spowoduje{" "}
-                    <span className="font-bold underline">
-                      natychmiastowe zakończenie quizu
-                    </span>{" "}
-                    i wysłanie obecnego wyniku.
-                  </p>
-                </div>
               </div>
             )}
           </div>

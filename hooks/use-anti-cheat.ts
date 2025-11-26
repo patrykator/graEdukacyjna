@@ -1,21 +1,15 @@
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 
-export function useAntiCheat(
-  enabled: boolean,
-  onCheatDetected: () => void
-) {
-  const [cheatingDetected, setCheatingDetected] = useState(false);
+export function useAntiCheat(enabled: boolean, onCheatDetected: () => void) {
   const hasTriggeredRef = useRef(false);
 
   useEffect(() => {
-    if (!enabled || cheatingDetected || hasTriggeredRef.current) return;
+    if (!enabled || hasTriggeredRef.current) return;
 
     const handleCheat = () => {
-      if (!cheatingDetected && !hasTriggeredRef.current) {
-        hasTriggeredRef.current = true;
-        setCheatingDetected(true);
-        onCheatDetected();
-      }
+      if (hasTriggeredRef.current) return;
+      hasTriggeredRef.current = true;
+      onCheatDetected();
     };
 
     const handleVisibilityChange = () => {
@@ -35,8 +29,5 @@ export function useAntiCheat(
       document.removeEventListener("visibilitychange", handleVisibilityChange);
       window.removeEventListener("blur", handleBlur);
     };
-  }, [enabled, cheatingDetected, onCheatDetected]);
-
-  return { cheatingDetected };
+  }, [enabled, onCheatDetected]);
 }
-

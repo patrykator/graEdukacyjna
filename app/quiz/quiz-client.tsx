@@ -7,7 +7,6 @@ import { saveScore } from "../actions";
 import { UserResult, Question } from "@/types";
 import { useAntiCheat } from "@/hooks/use-anti-cheat";
 import { useQuizKeyboard } from "@/hooks/use-quiz-keyboard";
-import { CheatScreen } from "@/components/quiz/cheat-screen";
 import { QuizCard } from "@/components/quiz/quiz-card";
 import { QuizProgress } from "@/components/quiz/quiz-progress";
 import { Loader } from "@/components/ui/loader";
@@ -23,6 +22,7 @@ export default function QuizClient({
 }: QuizClientProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [cheatingFlagged, setCheatingFlagged] = useState(false);
 
   const {
     currentQuestion,
@@ -51,35 +51,28 @@ export default function QuizClient({
     }
   }, [initialQuestions, shuffledOrder.length, reset]);
 
-  const submitQuiz = useCallback(
-    async (isCheating: boolean = false) => {
-      if (hasSubmittedRef.current) return;
-      hasSubmittedRef.current = true;
-      setIsSubmitting(true);
+  const submitQuiz = useCallback(async () => {
+    if (hasSubmittedRef.current) return;
+    hasSubmittedRef.current = true;
+    setIsSubmitting(true);
 
-      finish();
+    finish();
 
-      const state = useQuizStore.getState();
-      const currentAnswers = state.answers;
-      const currentOrderIds = state.shuffledOrder;
+    const state = useQuizStore.getState();
+    const currentAnswers = state.answers;
+    const currentOrderIds = state.shuffledOrder;
 
-      try {
-        await saveScore(currentAnswers, currentOrderIds, isCheating);
-        if (!isCheating) {
-          router.push("/results");
-        }
-      } catch (error) {
-        hasSubmittedRef.current = false;
-        setIsSubmitting(false);
-        console.error("Failed to submit quiz", error);
-      }
-    },
-    [finish, router]
-  );
+    try {
+      await saveScore(currentAnswers, currentOrderIds, cheatingFlagged);
+      router.push("/results");
+    } catch (error) {
+      hasSubmittedRef.current = false;
+      setIsSubmitting(false);
+      console.error("Failed to submit quiz", error);
+    }
+  }, [finish, router, cheatingFlagged]);
 
-  const { cheatingDetected } = useAntiCheat(!hasSubmittedRef.current, () =>
-    submitQuiz(true)
-  );
+  useAntiCheat(!hasSubmittedRef.current, () => setCheatingFlagged(true));
 
   const questionId = shuffledOrder[currentQuestion - 1];
   const chosen = answers[questionId];
@@ -90,14 +83,14 @@ export default function QuizClient({
   const handleNext = useCallback(async () => {
     if (isSubmitting) return;
     if (isLast) {
-      await submitQuiz(false);
+      await submitQuiz();
     } else {
       next(totalSteps);
     }
   }, [isSubmitting, isLast, submitQuiz, next, totalSteps]);
 
   useQuizKeyboard(
-    !cheatingDetected && !!shuffledOrder.length,
+    !!shuffledOrder.length,
     (key) => {
       const qId = shuffledOrder[currentQuestion - 1];
       setAnswer(qId, key);
@@ -109,10 +102,6 @@ export default function QuizClient({
       }
     }
   );
-
-  if (cheatingDetected) {
-    return <CheatScreen onRedirect={() => router.push("/results")} />;
-  }
 
   if (!shuffledOrder || shuffledOrder.length === 0) {
     return (
