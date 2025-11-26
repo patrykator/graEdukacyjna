@@ -1,6 +1,5 @@
-import Link from "next/link";
 import { LoginButton } from "@/components/login-button";
-import { Button } from "@/components/ui/button";
+import { HomeCtaButton } from "@/components/home-cta-button";
 import {
   Card,
   CardContent,
@@ -98,21 +97,8 @@ export default async function Home({
             >
               <LoginButton />
             </form>
-          ) : hasPlayed ? (
-            <Link href="/results" passHref className="w-full">
-              <Button variant="outline" size="lg" className="w-full text-lg">
-                Zobacz Wyniki
-              </Button>
-            </Link>
           ) : (
-            <Link href="/quiz" passHref className="w-full">
-              <Button
-                size="lg"
-                className="w-full text-lg shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all"
-              >
-                Rozpocznij Quiz
-              </Button>
-            </Link>
+            <HomeCtaButton hasPlayed={hasPlayed} />
           )}
         </CardFooter>
       </Card>

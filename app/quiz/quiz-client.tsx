@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useCallback, useRef } from "react";
+import { useEffect, useCallback, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useQuizStore } from "../stores/quiz-store";
 import { saveScore } from "../actions";
@@ -22,6 +22,7 @@ export default function QuizClient({
   initialQuestions,
 }: QuizClientProps) {
   const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
     currentQuestion,
@@ -54,6 +55,7 @@ export default function QuizClient({
     async (isCheating: boolean = false) => {
       if (hasSubmittedRef.current) return;
       hasSubmittedRef.current = true;
+      setIsSubmitting(true);
 
       finish();
 
@@ -66,7 +68,11 @@ export default function QuizClient({
         if (!isCheating) {
           router.push("/results");
         }
-      } catch {}
+      } catch (error) {
+        hasSubmittedRef.current = false;
+        setIsSubmitting(false);
+        console.error("Failed to submit quiz", error);
+      }
     },
     [finish, router]
   );
@@ -82,12 +88,13 @@ export default function QuizClient({
   const isLast = currentQuestion === totalSteps;
 
   const handleNext = useCallback(async () => {
+    if (isSubmitting) return;
     if (isLast) {
       await submitQuiz(false);
     } else {
       next(totalSteps);
     }
-  }, [isLast, submitQuiz, next, totalSteps]);
+  }, [isSubmitting, isLast, submitQuiz, next, totalSteps]);
 
   useQuizKeyboard(
     !cheatingDetected && !!shuffledOrder.length,
@@ -128,6 +135,7 @@ export default function QuizClient({
           onPrev={prev}
           isFirst={currentQuestion === 1}
           isLast={isLast}
+          isProcessing={isSubmitting}
         />
       ) : (
         <div className="text-center p-10">Brak pytań</div>

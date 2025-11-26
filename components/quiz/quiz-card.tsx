@@ -18,6 +18,7 @@ type QuizCardProps = {
   onPrev: () => void;
   isFirst: boolean;
   isLast: boolean;
+  isProcessing?: boolean;
 };
 
 export function QuizCard({
@@ -28,6 +29,7 @@ export function QuizCard({
   onPrev,
   isFirst,
   isLast,
+  isProcessing = false,
 }: QuizCardProps) {
   return (
     <Card className="shadow-xl border-primary/5 overflow-hidden flex-1 flex flex-col justify-between mb-2 md:mb-4 min-h-0">
@@ -83,9 +85,11 @@ export function QuizCard({
         </Button>
         <Button
           onClick={onNext}
-          disabled={!chosenAnswer}
+          disabled={!chosenAnswer || isProcessing}
           data-action="next"
           className="gap-2 shadow-lg shadow-primary/20 hover:shadow-primary/30 h-9 md:h-10 text-sm md:text-base px-3 md:px-4"
+          isLoading={isProcessing && isLast}
+          loadingText="Kończenie..."
         >
           {isLast ? "Zakończ" : "Następne"}
           {!isLast && <ArrowRight className="h-4 w-4" />}
