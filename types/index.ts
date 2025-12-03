@@ -16,7 +16,6 @@ export type LeaderboardUser = {
   id: string;
   name: string | null;
   score: number | null;
-  cheated: boolean;
 };
 
 export type SavedResult = {

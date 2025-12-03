@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { useQuizStore } from "../stores/quiz-store";
 import { saveScore } from "../actions";
 import { UserResult, Question } from "@/types";
-import { useAntiCheat } from "@/hooks/use-anti-cheat";
 import { useQuizKeyboard } from "@/hooks/use-quiz-keyboard";
 import { QuizCard } from "@/components/quiz/quiz-card";
 import { QuizProgress } from "@/components/quiz/quiz-progress";
@@ -22,7 +21,6 @@ export default function QuizClient({
 }: QuizClientProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [cheatingFlagged, setCheatingFlagged] = useState(false);
 
   const {
     currentQuestion,
@@ -63,16 +61,14 @@ export default function QuizClient({
     const currentOrderIds = state.shuffledOrder;
 
     try {
-      await saveScore(currentAnswers, currentOrderIds, cheatingFlagged);
+      await saveScore(currentAnswers, currentOrderIds);
       router.push("/results");
     } catch (error) {
       hasSubmittedRef.current = false;
       setIsSubmitting(false);
       console.error("Failed to submit quiz", error);
     }
-  }, [finish, router, cheatingFlagged]);
-
-  useAntiCheat(!hasSubmittedRef.current, () => setCheatingFlagged(true));
+  }, [finish, router]);
 
   const questionId = shuffledOrder[currentQuestion - 1];
   const chosen = answers[questionId];

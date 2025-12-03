@@ -21,7 +21,6 @@ model User {
   completedAt   DateTime?
   answers       Json?     
   quizOrder     Json?     
-  cheated       Boolean   @default(false)
  
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

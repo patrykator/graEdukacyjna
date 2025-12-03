@@ -1,4 +1,4 @@
-import { RotateCw, AlertTriangle } from "lucide-react";
+import { RotateCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { LeaderboardUser } from "@/types";
@@ -65,11 +65,6 @@ export function LeaderboardTable({
                   </td>
                   <td className="p-4 align-middle [&:has([role=checkbox])]:pr-0 flex items-center gap-2">
                     {user.name || "Anonim"}
-                    {user.cheated && (
-                      <div title="Wykryto naruszenie zasad">
-                        <AlertTriangle className="h-4 w-4 text-destructive" />
-                      </div>
-                    )}
                   </td>
                   <td className="p-4 align-middle [&:has([role=checkbox])]:pr-0 text-right font-mono">
                     {user.score} / {quizLength}

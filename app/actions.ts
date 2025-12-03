@@ -11,7 +11,6 @@ import { rateLimit } from "@/lib/rate-limit";
 const saveScoreSchema = z.object({
   answers: z.record(z.string(), z.string().optional()),
   quizOrder: z.array(z.string()),
-  cheated: z.boolean(),
 });
 
 const limiter = rateLimit({
@@ -19,12 +18,8 @@ const limiter = rateLimit({
   uniqueTokenPerInterval: 500,
 });
 
-export async function saveScore(
-  answers: QuizAnswers,
-  quizOrder: QuizOrder,
-  cheated: boolean = false
-) {
-  const validation = saveScoreSchema.safeParse({ answers, quizOrder, cheated });
+export async function saveScore(answers: QuizAnswers, quizOrder: QuizOrder) {
+  const validation = saveScoreSchema.safeParse({ answers, quizOrder });
 
   if (!validation.success) {
     throw new Error("Invalid input data");
@@ -66,7 +61,6 @@ export async function saveScore(
       completedAt: new Date(),
       answers: answers as any,
       quizOrder: quizOrder as any,
-      cheated: cheated,
     },
   });
 
@@ -89,7 +83,6 @@ export async function getLeaderboard() {
       id: true,
       name: true,
       score: true,
-      cheated: true,
     },
     take: 50,
   });
